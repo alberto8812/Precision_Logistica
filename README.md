@@ -88,7 +88,7 @@ docker compose down
 
 ## Documentación de la API
 
-Swagger disponible en `http://localhost:3000/api` una vez levantado el servidor.
+Swagger disponible en `http://localhost:3000/docs` una vez levantado el servidor.
 
 ## Estructura del repositorio
 
