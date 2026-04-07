@@ -33,61 +33,62 @@ La validación de placas usa el patrón **Strategy**, permitiendo intercambiar f
 ## Prerrequisitos
 
 - Docker y Docker Compose
-- Node.js 20+
-- pnpm
 
 ## Levantar el proyecto
 
 ### 1. Variables de entorno
 
+Copiá el template y completá los valores:
+
 ```bash
-cp back/.env.example back/.env
-# Editar back/.env con los valores correspondientes
+cp .env.template .env
 ```
 
-### 2. Infraestructura (PostgreSQL + Redis + Backend)
+Variables requeridas en `.env`:
+
+| Variable | Descripción |
+|----------|-------------|
+| `PORT_BACKEND` | Puerto del backend (ej: `3000`) |
+| `DATABASE_URL` | URL de conexión Prisma |
+| `DB_HOST` | Host de PostgreSQL (usar `postgres` dentro de Docker) |
+| `DB_PORT` | Puerto interno de PostgreSQL (`5432`) |
+| `DB_USERNAME` | Usuario de la base de datos |
+| `DB_PASSWORD` | Contraseña de la base de datos |
+| `DB_NAME` | Nombre de la base de datos |
+| `REDIS_HOST` | Host de Redis (usar `redis` dentro de Docker) |
+| `REDIS_PORT` | Puerto de Redis (`6379`) |
+
+### 2. Levantar todo desde el root
 
 ```bash
 docker compose up -d
 ```
 
-Esto levanta:
-- `postgres_transport` en el puerto `5433`
-- `redis_transport` en el puerto `6379`
-- `backend` (NestJS en modo desarrollo con hot-reload)
+Esto levanta los tres servicios:
 
-### 3. Migraciones y seed (primera vez)
+| Servicio | Descripción | Puerto |
+|----------|-------------|--------|
+| `postgres_transport` | PostgreSQL 16.2 | `5433` (host) |
+| `redis_transport` | Redis 7.0 | `6379` |
+| `backend` | NestJS (hot-reload) | `3000` |
 
-```bash
-# Dentro del contenedor del backend o con pnpm local
-pnpm --prefix back prisma migrate dev
-pnpm --prefix back run seed
-```
+> Las migraciones de Prisma corren automáticamente al iniciar el contenedor del backend (`entrypoint.dev.sh`).
 
-## Desarrollo local (sin Docker para el backend)
+### 3. Seed (opcional — solo primera vez)
 
 ```bash
-cd back
-pnpm install
-pnpm start:dev
+docker compose exec backend pnpm run seed
 ```
 
-> La base de datos y Redis deben estar corriendo. Podés levantarlos solos con `docker compose up postgres redis -d`.
+### Detener los servicios
 
-## Scripts disponibles (back/)
-
-| Comando | Descripción |
-|---------|-------------|
-| `pnpm start:dev` | Servidor con hot-reload |
-| `pnpm build` | Compilación para producción |
-| `pnpm test` | Tests unitarios |
-| `pnpm test:cov` | Tests con cobertura |
-| `pnpm lint` | Linter + autofix |
-| `pnpm run seed` | Poblar base de datos |
+```bash
+docker compose down
+```
 
 ## Documentación de la API
 
-Swagger disponible en `http://localhost:{PORT}/api` una vez levantado el servidor.
+Swagger disponible en `http://localhost:3000/api` una vez levantado el servidor.
 
 ## Estructura del repositorio
 
