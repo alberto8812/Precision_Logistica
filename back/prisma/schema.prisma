@@ -1,0 +1,33 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum status {
+  PENDING
+  IN_PROGRESS
+  DELIVERED
+}
+
+model sheuduling {
+  id             String   @id @default(uuid())
+  driverName     String
+  plates         String   @unique
+  status         status
+  programingDate DateTime
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  date           DateTime
+
+  @@index([createdAt(sort: Desc), id(sort: Desc)], map: "sheuduling_created_at_id_desc_idx")
+  @@index([createdAt(sort: Asc), id(sort: Asc)], map: "sheuduling_created_at_id_asc_idx")
+}

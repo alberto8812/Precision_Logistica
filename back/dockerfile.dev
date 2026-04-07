@@ -1,0 +1,20 @@
+FROM node:22-alpine  AS development
+
+RUN npm install -g pnpm
+
+WORKDIR /usr/app/src
+
+COPY package.json pnpm-lock.yaml ./
+
+RUN pnpm install
+
+COPY . .
+
+
+RUN npx prisma generate
+
+
+COPY entrypoint.dev.sh /usr/src/app/entrypoint.dev.sh
+RUN chmod +x /usr/src/app/entrypoint.dev.sh
+
+CMD [ "/usr/src/app/entrypoint.dev.sh" ]
