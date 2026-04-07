@@ -1,0 +1,40 @@
+include:
+  - path: ./back/compose.yml
+services:
+  postgres:
+    image: postgres:16.2
+    container_name: postgres_transport
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-123456}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-databases.sql:/docker-entrypoint-initdb.d/init-databases.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - network
+
+  redis:
+    image: redis:7.0-alpine
+    container_name: redis_transport
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - network
+
+volumes:
+  postgres_data:
+  redis_data:
+networks:
+  network:
+    driver: bridge
